@@ -40,16 +40,28 @@ Proyek ini mendokumentasikan pembelajaran harian saya selama 100 hari, mencakup 
 
 ## 💡 Catatan
 
-Posting harian juga akan dibagikan di [LinkedIn saya](https://www.linkedin.com/in/idris-9577bb56) dan format blog (jika memungkinkan).
+Posting harian juga akan dibagikan di [LinkedIn saya](https://www.linkedin.com/in/idris-9577bb56)
 
 ---
 
-Setelah Anda buat file `README.md` tersebut di folder project lokal Anda:
+✅ Cara Clone Repo GitHub
 
-### Jalankan perintah berikut di terminal:
+https://github.com/idsoke/100DaysWithSpringboot.git
+Jalankan perintah ini di terminal (Command Prompt, Git Bash, atau PowerShell):
 
-```bash
-git add README.md
-git commit -m "Add initial README.md"
-git push
+git clone https://github.com/idsoke/100DaysWithSpringboot.git
+Setelah itu, akan terbentuk folder bernama 100DaysWithSpringboot di direktori kamu sekarang, berisi semua file dari repo GitHub.
+
+📌 Langkah Tambahan Setelah Clone (opsional):
+Masuk ke folder project:
+
+cd 100DaysWithSpringboot
+
+Cek branch yang aktif:
+git branch
+
+Jalankan project (kalau project Spring Boot):
+./mvnw spring-boot:run
+atau
+mvn spring-boot:run
 
