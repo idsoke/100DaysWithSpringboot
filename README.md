@@ -54,7 +54,7 @@ Masuk ke folder project:
 cd 100DaysWithSpringboot
 
 **Cek branch yang aktif:**
-git branch_
+git branch
 
 **Jalankan project (kalau project Spring Boot):**
 ./mvnw spring-boot:run
