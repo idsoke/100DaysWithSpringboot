@@ -20,6 +20,7 @@ Proyek ini mendokumentasikan pembelajaran harian saya selama 100 hari, mencakup 
 | 1 | Membuat project Spring Boot dari Spring Initializr | ✅ |
 | 2 | Struktur folder & konfigurasi Maven | ✅ |
 | 3 | Membuat REST API pertama | ✅ |
+| 4 | Melengkapi CRUD Customer (getById, create, update, delete) | ✅ |
 | ... | ... | ⏳ |
 
 ## 🧰 Teknologi
