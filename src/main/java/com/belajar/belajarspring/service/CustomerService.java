@@ -1,6 +1,7 @@
 package com.belajar.belajarspring.service;
 
 import com.belajar.belajarspring.entity.Customer;
+import com.belajar.belajarspring.exception.ResourceNotFoundException;
 import com.belajar.belajarspring.repository.CustomerRepository;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,7 @@ public class CustomerService {
 
     public Customer getCustomerById(Long id) {
         return customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + id));
     }
 
     public Customer createCustomer(Customer customer) {
