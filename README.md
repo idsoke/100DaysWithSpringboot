@@ -21,6 +21,7 @@ Proyek ini mendokumentasikan pembelajaran harian saya selama 100 hari, mencakup 
 | 3 | Membuat REST API pertama | ✅ |
 | 4 | Melengkapi CRUD Customer (getById, create, update, delete) | ✅ |
 | 5 | Pisahkan Entity dari API response dengan DTO & Mapper | ✅ |
+| 6 | Bean Validation pada request (`@NotBlank`, `@Email`, `@Valid`) | ✅ |
 | ... | ... | ⏳ |
 
 ## 🧰 Teknologi

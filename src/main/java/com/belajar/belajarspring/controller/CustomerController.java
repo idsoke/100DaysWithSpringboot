@@ -5,6 +5,7 @@ import com.belajar.belajarspring.dto.CustomerResponse;
 import com.belajar.belajarspring.entity.Customer;
 import com.belajar.belajarspring.mapper.CustomerMapper;
 import com.belajar.belajarspring.service.CustomerService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,13 +34,13 @@ public class CustomerController {
     }
 
     @PostMapping
-    public CustomerResponse createCustomer(@RequestBody CustomerRequest request) {
+    public CustomerResponse createCustomer(@Valid @RequestBody CustomerRequest request) {
         Customer customer = customerService.createCustomer(CustomerMapper.toEntity(request));
         return CustomerMapper.toResponse(customer);
     }
 
     @PutMapping("/{id}")
-    public CustomerResponse updateCustomer(@PathVariable Long id, @RequestBody CustomerRequest request) {
+    public CustomerResponse updateCustomer(@PathVariable Long id, @Valid @RequestBody CustomerRequest request) {
         Customer customer = customerService.updateCustomer(id, CustomerMapper.toEntity(request));
         return CustomerMapper.toResponse(customer);
     }
