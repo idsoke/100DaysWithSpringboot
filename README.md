@@ -24,6 +24,7 @@ Proyek ini mendokumentasikan pembelajaran harian saya selama 100 hari, mencakup 
 | 6 | Bean Validation pada request (`@NotBlank`, `@Email`, `@Valid`) | ✅ |
 | 7 | Global Exception Handling (`@RestControllerAdvice`) | ✅ |
 | 8 | Unit Testing dengan JUnit & Mockito (`CustomerService`, `CustomerController`) | ✅ |
+| 9 | Integration Testing dengan `@SpringBootTest`, `TestRestTemplate`, dan H2 In-Memory Database | ✅ |
 | ... | ... | ⏳ |
 
 ## 🧰 Teknologi
