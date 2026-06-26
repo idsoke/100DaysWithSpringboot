@@ -9,6 +9,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 import java.util.Optional;
@@ -112,5 +115,18 @@ class CustomerServiceTest {
         assertThatThrownBy(() -> customerService.deleteCustomer(99L))
                 .isInstanceOf(ResourceNotFoundException.class);
         verify(customerRepository, never()).delete(any());
+    }
+
+    @Test
+    void getCustomersPaged_shouldReturnPagedResult() {
+        PageRequest pageable = PageRequest.of(0, 2);
+        Page<Customer> pagedResult = new PageImpl<>(List.of(customer), pageable, 1);
+        when(customerRepository.findAll(pageable)).thenReturn(pagedResult);
+
+        Page<Customer> result = customerService.getCustomersPaged(pageable);
+
+        assertThat(result.getContent()).hasSize(1).containsExactly(customer);
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getTotalPages()).isEqualTo(1);
     }
 }

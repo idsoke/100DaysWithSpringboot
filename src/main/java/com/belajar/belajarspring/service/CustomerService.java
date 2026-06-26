@@ -3,6 +3,8 @@ package com.belajar.belajarspring.service;
 import com.belajar.belajarspring.entity.Customer;
 import com.belajar.belajarspring.exception.ResourceNotFoundException;
 import com.belajar.belajarspring.repository.CustomerRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +20,10 @@ public class CustomerService {
 
     public List<Customer> getAllCustomers() {
         return customerRepository.findAll();
+    }
+
+    public Page<Customer> getCustomersPaged(Pageable pageable) {
+        return customerRepository.findAll(pageable);
     }
 
     public Customer getCustomerById(Long id) {

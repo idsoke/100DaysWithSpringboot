@@ -15,6 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.List;
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 // @SpringBootTest: load full application context (termasuk server HTTP sungguhan)
@@ -125,5 +128,41 @@ class CustomerIntegrationTest {
         restTemplate.delete("/api/customers/" + saved.getId());
 
         assertThat(customerRepository.findById(saved.getId())).isEmpty();
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void getCustomersPaged_shouldReturnPaginatedResult() {
+        customerRepository.save(new Customer(null, "Nana", "nana@example.com"));
+        customerRepository.save(new Customer(null, "Omar", "omar@example.com"));
+        customerRepository.save(new Customer(null, "Petra", "petra@example.com"));
+
+        ResponseEntity<Map> response = restTemplate.getForEntity(
+                "/api/customers/paged?page=0&size=2&sortBy=name&direction=asc", Map.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Map<String, Object> body = response.getBody();
+        assertThat(body).isNotNull();
+        assertThat((List<?>) body.get("content")).hasSize(2);
+        assertThat(body.get("totalElements")).isEqualTo(3);
+        assertThat(body.get("totalPages")).isEqualTo(2);
+        assertThat(body.get("last")).isEqualTo(false);
+        assertThat(body.get("page")).isEqualTo(0);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void getCustomersPaged_withDescSort_shouldReturnInReverseOrder() {
+        customerRepository.save(new Customer(null, "Amir", "amir@example.com"));
+        customerRepository.save(new Customer(null, "Zara", "zara@example.com"));
+
+        ResponseEntity<Map> response = restTemplate.getForEntity(
+                "/api/customers/paged?page=0&size=10&sortBy=name&direction=desc", Map.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Map<String, Object> body = response.getBody();
+        List<Map<String, Object>> content = (List<Map<String, Object>>) body.get("content");
+        assertThat(content.get(0).get("name")).isEqualTo("Zara");
+        assertThat(content.get(1).get("name")).isEqualTo("Amir");
     }
 }

@@ -9,6 +9,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -95,5 +99,25 @@ class CustomerControllerTest {
     void deleteCustomer_shouldReturn200() throws Exception {
         mockMvc.perform(delete("/api/customers/1"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void getCustomersPaged_shouldReturnPagedResponse() throws Exception {
+        Customer customer = new Customer(1L, "Budi", "budi@example.com");
+        Page<Customer> pagedResult = new PageImpl<>(List.of(customer), PageRequest.of(0, 10), 1);
+        when(customerService.getCustomersPaged(any(Pageable.class))).thenReturn(pagedResult);
+
+        mockMvc.perform(get("/api/customers/paged")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sortBy", "id")
+                        .param("direction", "asc"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].name").value("Budi"))
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.totalPages").value(1))
+                .andExpect(jsonPath("$.page").value(0))
+                .andExpect(jsonPath("$.size").value(10))
+                .andExpect(jsonPath("$.last").value(true));
     }
 }
