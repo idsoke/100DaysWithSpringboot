@@ -8,7 +8,8 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Customer {
+@EqualsAndHashCode(callSuper = false)
+public class Customer extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

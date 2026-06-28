@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -148,6 +149,47 @@ class CustomerIntegrationTest {
         assertThat(body.get("totalPages")).isEqualTo(2);
         assertThat(body.get("last")).isEqualTo(false);
         assertThat(body.get("page")).isEqualTo(0);
+    }
+
+    @Test
+    void createCustomer_shouldAutoPopulateAuditFields() {
+        CustomerRequest request = new CustomerRequest();
+        request.setName("Audit User");
+        request.setEmail("audit@example.com");
+
+        ResponseEntity<CustomerResponse> response = restTemplate.postForEntity(
+                "/api/customers", request, CustomerResponse.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        CustomerResponse body = response.getBody();
+        assertThat(body).isNotNull();
+        assertThat(body.getCreatedAt()).isNotNull();
+        assertThat(body.getUpdatedAt()).isNotNull();
+    }
+
+    @Test
+    void updateCustomer_shouldUpdateUpdatedAtButNotCreatedAt() {
+        Customer saved = customerRepository.save(new Customer(null, "Rudi", "rudi@example.com"));
+        // flush agar createdAt/updatedAt tersimpan
+        customerRepository.flush();
+        LocalDateTime createdAt = saved.getCreatedAt();
+
+        CustomerRequest updateRequest = new CustomerRequest();
+        updateRequest.setName("Rudi Baru");
+        updateRequest.setEmail("rudi.baru@example.com");
+
+        ResponseEntity<CustomerResponse> response = restTemplate.exchange(
+                "/api/customers/" + saved.getId(),
+                HttpMethod.PUT,
+                new HttpEntity<>(updateRequest),
+                CustomerResponse.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        CustomerResponse body = response.getBody();
+        assertThat(body.getCreatedAt()).isNotNull();
+        assertThat(body.getUpdatedAt()).isNotNull();
+        // updatedAt tidak boleh sebelum createdAt
+        assertThat(body.getUpdatedAt()).isAfterOrEqualTo(body.getCreatedAt());
     }
 
     @Test
