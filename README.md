@@ -27,6 +27,7 @@ Proyek ini mendokumentasikan pembelajaran harian saya selama 100 hari, mencakup 
 | 9 | Integration Testing dengan `@SpringBootTest`, `TestRestTemplate`, dan H2 In-Memory Database | ✅ |
 | 10 | Pagination & Sorting dengan Spring Data JPA (`Pageable`, `PagedResponse`) | ✅ |
 | 11 | JPA Auditing (`@EnableJpaAuditing`, `@CreatedDate`, `@LastModifiedDate`, `BaseEntity`) | ✅ |
+| 12 | Spring Cache (`@EnableCaching`, `@Cacheable`, `@CachePut`, `@CacheEvict`) | ✅ |
 | ... | ... | ⏳ |
 
 ## 🧰 Teknologi
