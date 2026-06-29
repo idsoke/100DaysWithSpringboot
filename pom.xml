@@ -63,6 +63,12 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Cache -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+
         <!-- H2 In-Memory Database untuk Integration Test -->
         <dependency>
             <groupId>com.h2database</groupId>
