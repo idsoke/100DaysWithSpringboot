@@ -28,6 +28,7 @@ Proyek ini mendokumentasikan pembelajaran harian saya selama 100 hari, mencakup 
 | 10 | Pagination & Sorting dengan Spring Data JPA (`Pageable`, `PagedResponse`) | ✅ |
 | 11 | JPA Auditing (`@EnableJpaAuditing`, `@CreatedDate`, `@LastModifiedDate`, `BaseEntity`) | ✅ |
 | 12 | Spring Cache (`@EnableCaching`, `@Cacheable`, `@CachePut`, `@CacheEvict`) | ✅ |
+| 13 | Asynchronous Processing (`@EnableAsync`, `@Async`, `CompletableFuture`, `ThreadPoolTaskExecutor`) | ✅ |
 | ... | ... | ⏳ |
 
 ## 🧰 Teknologi
