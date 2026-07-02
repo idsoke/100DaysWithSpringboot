@@ -16,9 +16,11 @@ import java.util.List;
 public class CustomerService {
 
     private final CustomerRepository customerRepository;
+    private final NotificationService notificationService;
 
-    public CustomerService(CustomerRepository customerRepository) {
+    public CustomerService(CustomerRepository customerRepository, NotificationService notificationService) {
         this.customerRepository = customerRepository;
+        this.notificationService = notificationService;
     }
 
     public List<Customer> getAllCustomers() {
@@ -37,7 +39,9 @@ public class CustomerService {
     }
 
     public Customer createCustomer(Customer customer) {
-        return customerRepository.save(customer);
+        Customer saved = customerRepository.save(customer);
+        notificationService.sendWelcomeNotification(saved);
+        return saved;
     }
 
     // Selalu eksekusi method dan update cache dengan data terbaru.
