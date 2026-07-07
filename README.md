@@ -29,6 +29,7 @@ Proyek ini mendokumentasikan pembelajaran harian saya selama 100 hari, mencakup 
 | 11 | JPA Auditing (`@EnableJpaAuditing`, `@CreatedDate`, `@LastModifiedDate`, `BaseEntity`) | ✅ |
 | 12 | Spring Cache (`@EnableCaching`, `@Cacheable`, `@CachePut`, `@CacheEvict`) | ✅ |
 | 13 | Asynchronous Processing (`@EnableAsync`, `@Async`, `CompletableFuture`, `ThreadPoolTaskExecutor`) | ✅ |
+| 14 | Event-Driven dengan Application Events (`ApplicationEventPublisher`, `ApplicationEvent`, `@EventListener`) | ✅ |
 | ... | ... | ⏳ |
 
 ## 🧰 Teknologi
