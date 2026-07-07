@@ -25,6 +25,28 @@ public class NotificationService {
         log.info("[{}] Notifikasi terkirim ke {}", Thread.currentThread().getName(), customer.getEmail());
     }
 
+    @Async
+    public void sendUpdateNotification(Customer customer) {
+        log.info("[{}] Mengirim notifikasi update ke {}", Thread.currentThread().getName(), customer.getEmail());
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        log.info("[{}] Notifikasi update terkirim ke {}", Thread.currentThread().getName(), customer.getEmail());
+    }
+
+    @Async
+    public void sendDeletionNotification(Customer customer) {
+        log.info("[{}] Mengirim notifikasi penghapusan ke {}", Thread.currentThread().getName(), customer.getEmail());
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        log.info("[{}] Notifikasi penghapusan terkirim ke {}", Thread.currentThread().getName(), customer.getEmail());
+    }
+
     // Async dengan return value: caller bisa .get() saat butuh hasilnya
     @Async
     public CompletableFuture<String> generateWelcomeReport(Customer customer) {

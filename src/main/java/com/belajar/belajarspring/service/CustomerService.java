@@ -1,11 +1,15 @@
 package com.belajar.belajarspring.service;
 
 import com.belajar.belajarspring.entity.Customer;
+import com.belajar.belajarspring.event.CustomerCreatedEvent;
+import com.belajar.belajarspring.event.CustomerDeletedEvent;
+import com.belajar.belajarspring.event.CustomerUpdatedEvent;
 import com.belajar.belajarspring.exception.ResourceNotFoundException;
 import com.belajar.belajarspring.repository.CustomerRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,11 +20,11 @@ import java.util.List;
 public class CustomerService {
 
     private final CustomerRepository customerRepository;
-    private final NotificationService notificationService;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public CustomerService(CustomerRepository customerRepository, NotificationService notificationService) {
+    public CustomerService(CustomerRepository customerRepository, ApplicationEventPublisher eventPublisher) {
         this.customerRepository = customerRepository;
-        this.notificationService = notificationService;
+        this.eventPublisher = eventPublisher;
     }
 
     public List<Customer> getAllCustomers() {
@@ -40,25 +44,26 @@ public class CustomerService {
 
     public Customer createCustomer(Customer customer) {
         Customer saved = customerRepository.save(customer);
-        notificationService.sendWelcomeNotification(saved);
+        eventPublisher.publishEvent(new CustomerCreatedEvent(this, saved));
         return saved;
     }
 
-    // Selalu eksekusi method dan update cache dengan data terbaru.
     @CachePut(value = "customers", key = "#id")
     public Customer updateCustomer(Long id, Customer customer) {
         Customer existingCustomer = customerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + id));
         existingCustomer.setName(customer.getName());
         existingCustomer.setEmail(customer.getEmail());
-        return customerRepository.save(existingCustomer);
+        Customer updated = customerRepository.save(existingCustomer);
+        eventPublisher.publishEvent(new CustomerUpdatedEvent(this, updated));
+        return updated;
     }
 
-    // Hapus entry dari cache saat data dihapus.
     @CacheEvict(value = "customers", key = "#id")
     public void deleteCustomer(Long id) {
         Customer existingCustomer = customerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + id));
         customerRepository.delete(existingCustomer);
+        eventPublisher.publishEvent(new CustomerDeletedEvent(this, existingCustomer));
     }
 }
