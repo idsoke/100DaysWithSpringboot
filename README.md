@@ -30,6 +30,7 @@ Proyek ini mendokumentasikan pembelajaran harian saya selama 100 hari, mencakup 
 | 12 | Spring Cache (`@EnableCaching`, `@Cacheable`, `@CachePut`, `@CacheEvict`) | ✅ |
 | 13 | Asynchronous Processing (`@EnableAsync`, `@Async`, `CompletableFuture`, `ThreadPoolTaskExecutor`) | ✅ |
 | 14 | Event-Driven dengan Application Events (`ApplicationEventPublisher`, `ApplicationEvent`, `@EventListener`) | ✅ |
+| 15 | Spring Security dasar (`spring-boot-starter-security`, HTTP Basic Auth, role-based authorization) | ✅ |
 | ... | ... | ⏳ |
 
 ## 🧰 Teknologi
