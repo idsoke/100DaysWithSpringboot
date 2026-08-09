@@ -37,6 +37,8 @@ class CustomerIntegrationTest {
     @BeforeEach
     void setUp() {
         customerRepository.deleteAll();
+        // DataInitializer membuat akun admin/admin123 saat startup, dipakai untuk autentikasi Basic Auth di test ini
+        restTemplate = restTemplate.withBasicAuth("admin", "admin123");
     }
 
     @Test

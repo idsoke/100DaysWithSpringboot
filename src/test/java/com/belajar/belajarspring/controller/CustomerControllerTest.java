@@ -1,5 +1,6 @@
 package com.belajar.belajarspring.controller;
 
+import com.belajar.belajarspring.config.SecurityConfig;
 import com.belajar.belajarspring.dto.CustomerRequest;
 import com.belajar.belajarspring.entity.Customer;
 import com.belajar.belajarspring.exception.ResourceNotFoundException;
@@ -9,20 +10,25 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.anonymous;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CustomerController.class)
+@Import(SecurityConfig.class)
+@WithMockUser(roles = "ADMIN")
 class CustomerControllerTest {
 
     @Autowired
@@ -119,5 +125,19 @@ class CustomerControllerTest {
                 .andExpect(jsonPath("$.page").value(0))
                 .andExpect(jsonPath("$.size").value(10))
                 .andExpect(jsonPath("$.last").value(true));
+    }
+
+    @Test
+    void getAllCustomers_withoutAuthentication_shouldReturn401() throws Exception {
+        mockMvc.perform(get("/api/customers").with(anonymous()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void deleteCustomer_withUserRole_shouldReturn403() throws Exception {
+        mockMvc.perform(delete("/api/customers/1"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.status").value(403));
     }
 }
