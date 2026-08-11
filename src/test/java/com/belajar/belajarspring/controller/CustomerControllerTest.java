@@ -4,6 +4,7 @@ import com.belajar.belajarspring.config.SecurityConfig;
 import com.belajar.belajarspring.dto.CustomerRequest;
 import com.belajar.belajarspring.entity.Customer;
 import com.belajar.belajarspring.exception.ResourceNotFoundException;
+import com.belajar.belajarspring.security.JwtService;
 import com.belajar.belajarspring.service.CustomerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -39,6 +41,13 @@ class CustomerControllerTest {
 
     @MockBean
     private CustomerService customerService;
+
+    // Dependency dari JwtAuthenticationFilter yang ikut ter-scan sebagai bean Filter di @WebMvcTest
+    @MockBean
+    private JwtService jwtService;
+
+    @MockBean
+    private UserDetailsService userDetailsService;
 
     @Test
     void getAllCustomers_shouldReturnList() throws Exception {

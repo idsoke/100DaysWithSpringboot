@@ -2,6 +2,8 @@ package com.belajar.belajarspring;
 
 import com.belajar.belajarspring.dto.CustomerRequest;
 import com.belajar.belajarspring.dto.CustomerResponse;
+import com.belajar.belajarspring.dto.LoginRequest;
+import com.belajar.belajarspring.dto.LoginResponse;
 import com.belajar.belajarspring.entity.Customer;
 import com.belajar.belajarspring.repository.CustomerRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +15,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
@@ -37,8 +40,20 @@ class CustomerIntegrationTest {
     @BeforeEach
     void setUp() {
         customerRepository.deleteAll();
-        // DataInitializer membuat akun admin/admin123 saat startup, dipakai untuk autentikasi Basic Auth di test ini
-        restTemplate = restTemplate.withBasicAuth("admin", "admin123");
+
+        // DataInitializer membuat akun admin/admin123 saat startup; login untuk dapatkan JWT lalu pasang sebagai Bearer token
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setUsername("admin");
+        loginRequest.setPassword("admin123");
+        LoginResponse loginResponse = restTemplate.postForObject("/api/auth/login", loginRequest, LoginResponse.class);
+        String token = loginResponse.token();
+
+        ClientHttpRequestInterceptor bearerAuthInterceptor = (request, body, execution) -> {
+            request.getHeaders().setBearerAuth(token);
+            return execution.execute(request, body);
+        };
+        restTemplate.getRestTemplate().getInterceptors().clear();
+        restTemplate.getRestTemplate().getInterceptors().add(bearerAuthInterceptor);
     }
 
     @Test
