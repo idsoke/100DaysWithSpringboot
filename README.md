@@ -32,6 +32,7 @@ Proyek ini mendokumentasikan pembelajaran harian saya selama 100 hari, mencakup 
 | 14 | Event-Driven dengan Application Events (`ApplicationEventPublisher`, `ApplicationEvent`, `@EventListener`) | ✅ |
 | 15 | Spring Security dasar (`spring-boot-starter-security`, HTTP Basic Auth, role-based authorization) | ✅ |
 | 16 | JWT Authentication (`jjwt`, login endpoint, `JwtAuthenticationFilter`, stateless Bearer token) | ✅ |
+| 17 | Method-Level Security (`@EnableMethodSecurity`, `@PreAuthorize`, authorization pindah dari URL matcher ke service layer) | ✅ |
 | ... | ... | ⏳ |
 
 ## 🧰 Teknologi
