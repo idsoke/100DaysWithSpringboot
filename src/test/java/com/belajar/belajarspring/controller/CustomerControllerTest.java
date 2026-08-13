@@ -142,11 +142,8 @@ class CustomerControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
-    @Test
-    @WithMockUser(roles = "USER")
-    void deleteCustomer_withUserRole_shouldReturn403() throws Exception {
-        mockMvc.perform(delete("/api/customers/1"))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.status").value(403));
-    }
+    // Pengecekan role (mis. USER tidak boleh delete) sekarang ditegakkan oleh @PreAuthorize
+    // di CustomerService, bukan di filter chain lagi. Karena CustomerService di-mock di sini,
+    // aturan itu tidak akan aktif dalam @WebMvcTest ini — lihat CustomerServiceSecurityTest
+    // dan CustomerIntegrationTest untuk verifikasi end-to-end-nya.
 }

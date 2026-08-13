@@ -12,6 +12,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,27 +28,33 @@ public class CustomerService {
         this.eventPublisher = eventPublisher;
     }
 
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public List<Customer> getAllCustomers() {
         return customerRepository.findAll();
     }
 
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public Page<Customer> getCustomersPaged(Pageable pageable) {
         return customerRepository.findAll(pageable);
     }
 
-    // Simpan hasil ke cache dengan key = id. Panggilan berikutnya tidak hit DB.
+    // Security interceptor berjalan sebelum cache lookup (precedence tertinggi),
+    // jadi request tanpa izin tidak akan pernah membaca/mengisi cache.
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Cacheable(value = "customers", key = "#id")
     public Customer getCustomerById(Long id) {
         return customerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + id));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public Customer createCustomer(Customer customer) {
         Customer saved = customerRepository.save(customer);
         eventPublisher.publishEvent(new CustomerCreatedEvent(this, saved));
         return saved;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @CachePut(value = "customers", key = "#id")
     public Customer updateCustomer(Long id, Customer customer) {
         Customer existingCustomer = customerRepository.findById(id)
@@ -59,6 +66,7 @@ public class CustomerService {
         return updated;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @CacheEvict(value = "customers", key = "#id")
     public void deleteCustomer(Long id) {
         Customer existingCustomer = customerRepository.findById(id)

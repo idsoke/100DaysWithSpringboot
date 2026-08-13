@@ -210,6 +210,49 @@ class CustomerIntegrationTest {
     }
 
     @Test
+    void createCustomer_asUserRole_shouldReturn403() {
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setUsername("user");
+        loginRequest.setPassword("user123");
+        LoginResponse loginResponse = restTemplate.postForObject("/api/auth/login", loginRequest, LoginResponse.class);
+
+        ClientHttpRequestInterceptor userBearerAuthInterceptor = (request, body, execution) -> {
+            request.getHeaders().setBearerAuth(loginResponse.token());
+            return execution.execute(request, body);
+        };
+        restTemplate.getRestTemplate().getInterceptors().clear();
+        restTemplate.getRestTemplate().getInterceptors().add(userBearerAuthInterceptor);
+
+        CustomerRequest request = new CustomerRequest();
+        request.setName("Hana");
+        request.setEmail("hana@example.com");
+
+        ResponseEntity<String> response = restTemplate.postForEntity("/api/customers", request, String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(customerRepository.findAll()).isEmpty();
+    }
+
+    @Test
+    void getAllCustomers_asUserRole_shouldReturn200() {
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setUsername("user");
+        loginRequest.setPassword("user123");
+        LoginResponse loginResponse = restTemplate.postForObject("/api/auth/login", loginRequest, LoginResponse.class);
+
+        ClientHttpRequestInterceptor userBearerAuthInterceptor = (request, body, execution) -> {
+            request.getHeaders().setBearerAuth(loginResponse.token());
+            return execution.execute(request, body);
+        };
+        restTemplate.getRestTemplate().getInterceptors().clear();
+        restTemplate.getRestTemplate().getInterceptors().add(userBearerAuthInterceptor);
+
+        ResponseEntity<CustomerResponse[]> response = restTemplate.getForEntity("/api/customers", CustomerResponse[].class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
     @SuppressWarnings("unchecked")
     void getCustomersPaged_withDescSort_shouldReturnInReverseOrder() {
         customerRepository.save(new Customer(null, "Amir", "amir@example.com"));
