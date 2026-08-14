@@ -15,9 +15,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 // @EnableMethodSecurity mengaktifkan @PreAuthorize/@PostAuthorize di level method (service),
@@ -56,10 +56,30 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(handling -> handling
-                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                        .authenticationEntryPoint(authenticationEntryPoint())
                         .accessDeniedHandler(accessDeniedHandler()));
 
         return http.build();
+    }
+
+    // Dipanggil saat request tidak terautentikasi (token hilang/invalid/expired).
+    // JwtAuthenticationFilter menitipkan alasan spesifiknya lewat request attribute
+    // JWT_ERROR_ATTRIBUTE, sehingga client tahu apakah harus login ulang atau kirim token baru.
+    private AuthenticationEntryPoint authenticationEntryPoint() {
+        return (request, response, ex) -> {
+            String message = (String) request.getAttribute(JwtAuthenticationFilter.JWT_ERROR_ATTRIBUTE);
+            if (message == null) {
+                message = "Autentikasi diperlukan untuk mengakses resource ini";
+            }
+            ErrorResponse error = new ErrorResponse(
+                    HttpStatus.UNAUTHORIZED.value(),
+                    HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+                    message
+            );
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            objectMapper.writeValue(response.getWriter(), error);
+        };
     }
 
     private AccessDeniedHandler accessDeniedHandler() {

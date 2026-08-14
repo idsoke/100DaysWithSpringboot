@@ -6,16 +6,20 @@ import com.belajar.belajarspring.dto.LoginRequest;
 import com.belajar.belajarspring.dto.LoginResponse;
 import com.belajar.belajarspring.entity.Customer;
 import com.belajar.belajarspring.repository.CustomerRepository;
+import com.belajar.belajarspring.security.JwtService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
@@ -266,5 +270,38 @@ class CustomerIntegrationTest {
         List<Map<String, Object>> content = (List<Map<String, Object>>) body.get("content");
         assertThat(content.get(0).get("name")).isEqualTo("Zara");
         assertThat(content.get(1).get("name")).isEqualTo("Amir");
+    }
+
+    @Test
+    void getAllCustomers_withExpiredToken_shouldReturn401WithExpiredMessage() {
+        // secret harus sama dengan jwt.secret di application.properties; expirationMs negatif
+        // supaya token langsung expired begitu dibuat (lihat pola yang sama di JwtServiceTest)
+        JwtService shortLivedJwtService = new JwtService(
+                "ZmFrZS1zZWNyZXQta2V5LXVudHVrLWJlbGFqYXItc3ByaW5nLWJvb3QtaGFyaS0xNi1qd3QtYXV0aGVudGljYXRpb24=", -1000);
+        UserDetails admin = User.withUsername("admin").password("irrelevant").roles("ADMIN").build();
+        String expiredToken = shortLivedJwtService.generateToken(admin);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(expiredToken);
+        restTemplate.getRestTemplate().getInterceptors().clear();
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                "/api/customers", HttpMethod.GET, new HttpEntity<>(headers), String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertThat(response.getBody()).contains("kedaluwarsa");
+    }
+
+    @Test
+    void getAllCustomers_withMalformedToken_shouldReturn401WithInvalidMessage() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth("token-acak-yang-bukan-jwt");
+        restTemplate.getRestTemplate().getInterceptors().clear();
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                "/api/customers", HttpMethod.GET, new HttpEntity<>(headers), String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertThat(response.getBody()).contains("tidak valid");
     }
 }

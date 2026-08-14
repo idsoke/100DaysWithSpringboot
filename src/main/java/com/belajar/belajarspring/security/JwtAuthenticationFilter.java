@@ -1,5 +1,6 @@
 package com.belajar.belajarspring.security;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,6 +19,10 @@ import java.io.IOException;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    // Dibaca oleh AuthenticationEntryPoint di SecurityConfig untuk membedakan pesan error
+    // token expired vs invalid, alih-alih 401 polos tanpa keterangan.
+    public static final String JWT_ERROR_ATTRIBUTE = "jwt_error_message";
 
     private static final String AUTH_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
@@ -56,8 +61,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
+        } catch (ExpiredJwtException ex) {
+            SecurityContextHolder.clearContext();
+            request.setAttribute(JWT_ERROR_ATTRIBUTE, "Token sudah kedaluwarsa, silakan login ulang");
         } catch (JwtException | IllegalArgumentException ex) {
             SecurityContextHolder.clearContext();
+            request.setAttribute(JWT_ERROR_ATTRIBUTE, "Token tidak valid");
         }
 
         filterChain.doFilter(request, response);
