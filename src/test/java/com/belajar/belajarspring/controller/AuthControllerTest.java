@@ -6,8 +6,10 @@ import com.belajar.belajarspring.dto.RefreshTokenRequest;
 import com.belajar.belajarspring.entity.RefreshToken;
 import com.belajar.belajarspring.entity.Role;
 import com.belajar.belajarspring.entity.User;
+import com.belajar.belajarspring.exception.RateLimitExceededException;
 import com.belajar.belajarspring.repository.UserRepository;
 import com.belajar.belajarspring.security.JwtService;
+import com.belajar.belajarspring.security.LoginRateLimiterService;
 import com.belajar.belajarspring.security.RefreshTokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -27,8 +29,11 @@ import java.time.Instant;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -53,6 +58,9 @@ class AuthControllerTest {
 
     @MockBean
     private UserRepository userRepository;
+
+    @MockBean
+    private LoginRateLimiterService loginRateLimiterService;
 
     // Dependency dari JwtAuthenticationFilter yang ikut ter-scan sebagai bean Filter di @WebMvcTest
     @MockBean
@@ -116,6 +124,23 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.status").value(401));
+    }
+
+    @Test
+    void login_whenRateLimitExceeded_shouldReturn429WithRetryAfterHeader() throws Exception {
+        LoginRequest request = new LoginRequest();
+        request.setUsername("admin");
+        request.setPassword("admin123");
+
+        doThrow(new RateLimitExceededException("127.0.0.1", 30))
+                .when(loginRateLimiterService).checkAllowed(anyString());
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isTooManyRequests())
+                .andExpect(header().string("Retry-After", "30"))
+                .andExpect(jsonPath("$.status").value(429));
     }
 
     @Test
