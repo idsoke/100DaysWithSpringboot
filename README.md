@@ -34,6 +34,7 @@ Proyek ini mendokumentasikan pembelajaran harian saya selama 100 hari, mencakup 
 | 16 | JWT Authentication (`jjwt`, login endpoint, `JwtAuthenticationFilter`, stateless Bearer token) | ✅ |
 | 17 | Method-Level Security (`@EnableMethodSecurity`, `@PreAuthorize`, authorization pindah dari URL matcher ke service layer) | ✅ |
 | 18 | Refresh Token (`RefreshToken` entity, rotasi token sekali pakai, endpoint `/api/auth/refresh` & `/api/auth/logout`) | ✅ |
+| 19 | Rate Limiting Login (`LoginRateLimiterService`, fixed-window counter per IP, HTTP 429 + header `Retry-After`) | ✅ |
 | ... | ... | ⏳ |
 
 ## 🧰 Teknologi
